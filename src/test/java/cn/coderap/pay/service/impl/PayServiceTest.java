@@ -1,5 +1,6 @@
 package cn.coderap.pay.service.impl;
 import cn.coderap.pay.PayApplicationTests;
+import com.lly835.bestpay.enums.BestPayTypeEnum;
 import org.junit.Test;
 
 import javax.annotation.Resource;
@@ -13,6 +14,6 @@ public class PayServiceTest extends PayApplicationTests {
     @Test
     public void create() {
         //或者new BigDecimal("0.01"); 千万不要写成 new BigDecimal(0.01);
-        payService.create("1234567891234567", BigDecimal.valueOf(0.01));
+        payService.create("1234567891234567", BigDecimal.valueOf(0.01), BestPayTypeEnum.WXPAY_NATIVE);
     }
 }
