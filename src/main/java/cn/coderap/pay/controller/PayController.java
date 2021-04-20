@@ -1,6 +1,8 @@
 package cn.coderap.pay.controller;
 
+import cn.coderap.pay.pojo.PayInfo;
 import cn.coderap.pay.service.IPayService;
+import com.lly835.bestpay.config.WxPayConfig;
 import com.lly835.bestpay.enums.BestPayTypeEnum;
 import com.lly835.bestpay.model.PayResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +26,8 @@ public class PayController {
 
     @Resource
     private IPayService iPayService;
+    @Resource
+    private WxPayConfig wxPayConfig;
 
     //注意：这里不能发送get请求（得到的是支付页面的源码），只能跳转让浏览器访问才能拿到二维码
     @GetMapping("/create")
@@ -37,6 +41,8 @@ public class PayController {
         //支付方式不同，渲染就不同，WXPAY_NATIVE使用code_url，ALIPAY_PC使用body
         if (bestPayTypeEnum == BestPayTypeEnum.WXPAY_NATIVE) {
             map.put("codeUrl", response.getCodeUrl());
+            map.put("orderId",orderId);
+            map.put("returnUrl", wxPayConfig.getReturnUrl());
             return new ModelAndView("createForWxNative",map);
         }else if (bestPayTypeEnum == BestPayTypeEnum.ALIPAY_PC) {
             //得到的body是一个表单，且该表单是自动提交的，为了实现页面的跳转，将该body渲染到一个html中即可
@@ -50,5 +56,11 @@ public class PayController {
     @ResponseBody
     public String asyncNotify(@RequestBody String notifyData) {
         return iPayService.asyncNotify(notifyData);
+    }
+
+    @GetMapping("/payStatus")
+    @ResponseBody
+    public PayInfo queryPayStatusByOrderId(@RequestParam String orderId) {
+        return iPayService.queryPayStatusByOrderId(orderId);
     }
 }

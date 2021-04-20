@@ -1,5 +1,6 @@
 package cn.coderap.pay.service;
 
+import cn.coderap.pay.pojo.PayInfo;
 import com.lly835.bestpay.enums.BestPayTypeEnum;
 import com.lly835.bestpay.model.PayResponse;
 
@@ -18,4 +19,11 @@ public interface IPayService {
      * @param notifyData
      */
     String asyncNotify(String notifyData);
+
+    /**
+     * 通过订单号查询支付状态，支付完成页面跳转
+     * @param orderId
+     * @return
+     */
+    PayInfo queryPayStatusByOrderId(String orderId);
 }
