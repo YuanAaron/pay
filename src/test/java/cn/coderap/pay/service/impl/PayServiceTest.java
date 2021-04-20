@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 public class PayServiceTest extends PayApplicationTests {
 
     @Resource
-    private PayService payService;
+    private PayServiceImpl payService;
 
     @Test
     public void create() {
