@@ -4,6 +4,7 @@ import cn.coderap.pay.enums.PayPlatformEnum;
 import cn.coderap.pay.mapper.PayInfoMapper;
 import cn.coderap.pay.pojo.PayInfo;
 import cn.coderap.pay.service.IPayService;
+import com.google.gson.Gson;
 import com.lly835.bestpay.enums.BestPayPlatformEnum;
 import com.lly835.bestpay.enums.BestPayTypeEnum;
 import com.lly835.bestpay.enums.OrderStatusEnum;
@@ -11,6 +12,7 @@ import com.lly835.bestpay.model.PayRequest;
 import com.lly835.bestpay.model.PayResponse;
 import com.lly835.bestpay.service.BestPayService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,10 +27,14 @@ import java.math.BigDecimal;
 @Service
 public class PayServiceImpl implements IPayService {
 
+    private final String QUEUE_PAY_NOTIFY="payNotify";
+
     @Resource
     private BestPayService bestPayService;
     @Resource
     private PayInfoMapper payInfoMapper;
+    @Resource
+    private AmqpTemplate amqpTemplate;
 
     @Transactional
     @Override
@@ -72,7 +78,8 @@ public class PayServiceImpl implements IPayService {
             payInfoMapper.updateByPrimaryKeySelective(payInfo);
         }
 
-        //TODO pay发送MQ消息，mall接受MQ消息
+        //pay发送MQ消息，mall接受MQ消息
+        amqpTemplate.convertAndSend(QUEUE_PAY_NOTIFY,new Gson().toJson(payInfo));
 
         //4、告诉微信不要再通知了
         if (payResponse.getPayPlatformEnum()== BestPayPlatformEnum.WX) {
